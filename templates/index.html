@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airline Review Sentiment Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-light: #e0f2fe;
+            --primary-dark: #0369a1;
+            --bg-color: #f0f9ff;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+            --radius: 12px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background-image: radial-gradient(circle at top right, #bae6fd 0%, transparent 40%),
+                              radial-gradient(circle at bottom left, #e0f2fe 0%, transparent 40%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '✈️';
+            position: absolute;
+            font-size: 10rem;
+            opacity: 0.1;
+            top: -30px;
+            right: -30px;
+            transform: rotate(-45deg);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            color: var(--primary-light);
+            font-weight: 300;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 2.5rem 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 140px;
+            padding: 1.2rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .ratings-section-title {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .sliders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .slider-container {
+            background: #f8fafc;
+            padding: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .slider-container:hover {
+            border-color: var(--primary-light);
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.05);
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .slider-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .slider-value {
+            background: var(--primary);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            margin-top: -9px;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.4);
+            transition: transform 0.1s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(2, 132, 199, 0.2);
+        }
+
+        .submit-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Results Section */
+        #results {
+            display: none;
+            margin-top: 2.5rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .badge.positive { background: var(--success); }
+        .badge.neutral { background: var(--warning); }
+        .badge.negative { background: var(--danger); }
+
+        .confidence-container {
+            max-width: 450px;
+            margin: 0 auto 2rem auto;
+            text-align: left;
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .confidence-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--text-main);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .result-message {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            display: none;
+            background: #fef2f2;
+            color: var(--danger);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+            margin-top: 1.5rem;
+            font-weight: 500;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Airline Review Sentiment Analyzer</h1>
+        <p>AI-Powered Passenger Experience Insights</p>
+    </div>
+    
+    <div class="content">
+        <form id="analyzerForm">
+            <div class="form-group">
+                <label for="reviewText">Review Comments</label>
+                <textarea id="reviewText" placeholder="Write your airline review here..." required></textarea>
+            </div>
+
+
+
+            <button type="submit" id="submitBtn" class="submit-btn">
+                <span id="btnText">Analyze Sentiment ✈️</span>
+                <div id="spinner" class="spinner"></div>
+            </button>
+        </form>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <div id="results">
+            <div id="sentimentBadge" class="badge"></div>
+            
+            <div class="confidence-container">
+                <div class="confidence-label">
+                    <span>Confidence Score</span>
+                    <span id="confidenceValue">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="confidenceFill" class="progress-fill"></div>
+                </div>
+            </div>
+            
+            <p id="resultMessage" class="result-message"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+    document.getElementById('analyzerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const spinner = document.getElementById('spinner');
+        const resultsDiv = document.getElementById('results');
+        const errorDiv = document.getElementById('errorMessage');
+        const confidenceFill = document.getElementById('confidenceFill');
+        
+        errorDiv.style.display = 'none';
+        resultsDiv.style.display = 'none';
+        confidenceFill.style.width = '0%';
+        submitBtn.disabled = true;
+        btnText.style.display = 'none';
+        spinner.style.display = 'block';
+
+        const payload = {
+            review: document.getElementById('reviewText').value
+        };
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Server error occurred');
+            }
+
+            showResults(data.sentiment, data.confidence);
+
+        } catch (error) {
+            errorDiv.textContent = `Error: ${error.message}`;
+            errorDiv.style.display = 'block';
+        } finally {
+            submitBtn.disabled = false;
+            btnText.style.display = 'block';
+            spinner.style.display = 'none';
+        }
+    });
+
+    function showResults(sentiment, confidence) {
+        const resultsDiv = document.getElementById('results');
+        const badge = document.getElementById('sentimentBadge');
+        const confidenceFill = document.getElementById('confidenceFill');
+        const confidenceValue = document.getElementById('confidenceValue');
+        const resultMessage = document.getElementById('resultMessage');
+
+        badge.className = 'badge';
+        
+        const sentimentStr = String(sentiment).toLowerCase();
+        let percentage = Math.round(confidence * 100);
+
+        if (sentimentStr === 'positive' || sentimentStr === '2') {
+            badge.classList.add('positive');
+            badge.textContent = 'Positive';
+            resultMessage.textContent = 'Great experience! This passenger loved their flight ✈️';
+        } else if (sentimentStr === 'neutral' || sentimentStr === '1') {
+            badge.classList.add('neutral');
+            badge.textContent = 'Neutral';
+            resultMessage.textContent = 'Mixed experience. Room for improvement 🤔';
+        } else if (sentimentStr === 'negative' || sentimentStr === '0') {
+            badge.classList.add('negative');
+            badge.textContent = 'Negative';
+            resultMessage.textContent = 'Poor experience. Passenger was unsatisfied 😞';
+        } else {
+            badge.classList.add('neutral');
+            badge.textContent = sentiment;
+            resultMessage.textContent = 'Analysis complete.';
+        }
+
+        resultsDiv.style.display = 'block';
+        confidenceValue.textContent = `${percentage}%`;
+        
+        setTimeout(() => {
+            confidenceFill.style.width = `${percentage}%`;
+        }, 50);
+    }
+</script>
+
+</body>
+</html>
