@@ -3,23 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airline Review Sentiment Analyzer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>AeroSense AI — Airline Sentiment Analytics</title>
+    
+    <!-- Google Fonts: Outfit (Headings) & Inter (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
+        /* Modern Design System & Curated Color Palettes */
         :root {
-            --primary: #0284c7;
-            --primary-light: #e0f2fe;
-            --primary-dark: #0369a1;
-            --bg-color: #f0f9ff;
-            --surface: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #cbd5e1;
-            --success: #22c55e;
-            --warning: #eab308;
-            --danger: #ef4444;
-            --radius: 12px;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --bg-base: #0b0f19;
+            --bg-surface: rgba(30, 41, 59, 0.7);
+            --bg-card: rgba(15, 23, 42, 0.6);
+            --border-glow: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            
+            /* Accents */
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.15);
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.15);
+            
+            /* Sentiments */
+            --color-positive: #10b981;
+            --color-positive-glow: rgba(16, 185, 129, 0.2);
+            --color-neutral: #f59e0b;
+            --color-neutral-glow: rgba(245, 158, 11, 0.2);
+            --color-negative: #f43f5e;
+            --color-negative-glow: rgba(244, 63, 94, 0.2);
+            
+            --radius-xl: 20px;
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -30,439 +49,885 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-base);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 2rem;
-            background-image: radial-gradient(circle at top right, #bae6fd 0%, transparent 40%),
-                              radial-gradient(circle at bottom left, #e0f2fe 0%, transparent 40%);
+            position: relative;
+            overflow-x: hidden;
+            padding: 2.5rem 1rem;
         }
 
+        /* Ambient Glowing Orbs Background */
+        .ambient-glow-1 {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            top: -200px;
+            right: -100px;
+            z-index: 0;
+            pointer-events: none;
+            animation: floatOrb 15s infinite alternate ease-in-out;
+        }
+
+        .ambient-glow-2 {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--cyan-glow) 0%, transparent 70%);
+            bottom: -300px;
+            left: -200px;
+            z-index: 0;
+            pointer-events: none;
+            animation: floatOrb 20s infinite alternate-reverse ease-in-out;
+        }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(60px, 40px) scale(1.1); }
+        }
+
+        /* Glassmorphism Outer Shell Container */
         .container {
             width: 100%;
-            max-width: 800px;
-            background: var(--surface);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            max-width: 1000px;
+            background: var(--bg-surface);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            z-index: 10;
             overflow: hidden;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            transition: var(--transition-smooth);
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Main Workspace Column */
+        .workspace {
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            border-right: 1px solid var(--border-glow);
+        }
+
+        @media (max-width: 900px) {
+            .workspace {
+                border-right: none;
+                border-bottom: 1px solid var(--border-glow);
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* AeroSense Elegant Brand Header */
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-logo-container {
             position: relative;
+            background: linear-gradient(135deg, var(--primary), var(--cyan));
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
         }
 
-        .header {
-            background: var(--primary);
-            color: white;
-            padding: 2.5rem 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+        .brand-logo {
+            font-size: 1.6rem;
+            display: inline-block;
+            transition: transform 0.5s ease;
         }
 
-        .header::before {
-            content: '✈️';
-            position: absolute;
-            font-size: 10rem;
-            opacity: 0.1;
-            top: -30px;
-            right: -30px;
-            transform: rotate(-45deg);
+        .brand-header:hover .brand-logo {
+            transform: translate(3px, -3px) rotate(-15deg) scale(1.1);
         }
 
-        .header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 1;
+        .brand-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .header p {
-            color: var(--primary-light);
-            font-weight: 300;
-            font-size: 1.1rem;
-            position: relative;
-            z-index: 1;
+        .brand-text p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 400;
         }
 
-        .content {
-            padding: 2.5rem 2rem;
+        /* Review Input Section */
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
 
-        .form-group {
-            margin-bottom: 2rem;
-        }
-
-        label {
-            display: block;
+        .section-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
             font-weight: 600;
-            margin-bottom: 0.8rem;
             color: var(--text-main);
-            font-size: 1rem;
+            letter-spacing: 0.2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .textarea-wrapper {
+            position: relative;
         }
 
         textarea {
             width: 100%;
-            min-height: 140px;
-            padding: 1.2rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
+            min-height: 180px;
+            padding: 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-lg);
+            color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            font-size: 1rem;
+            font-size: 0.97rem;
+            line-height: 1.6;
             resize: vertical;
-            transition: all 0.3s ease;
-            background-color: #f8fafc;
+            transition: var(--transition-smooth);
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
         textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            background-color: white;
-            box-shadow: 0 0 0 4px var(--primary-light);
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15), inset 0 2px 4px rgba(0,0,0,0.2);
+            background: rgba(15, 23, 42, 0.85);
         }
 
-        .ratings-section-title {
-            font-weight: 600;
-            color: var(--text-main);
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .sliders-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .slider-container {
-            background: #f8fafc;
-            padding: 1.2rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .slider-container:hover {
-            border-color: var(--primary-light);
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.05);
-        }
-
-        .slider-header {
+        /* Real-time Typing Telemetry Counter */
+        .typing-stats {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
+            gap: 1.25rem;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 0.25rem;
+            justify-content: flex-end;
         }
 
-        .slider-label {
-            font-size: 0.9rem;
+        .stat-item {
+            background: rgba(15, 23, 42, 0.4);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        /* Interactive Preset Chips */
+        .chips-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .chips-title {
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .slider-value {
-            background: var(--primary);
-            color: white;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
+        .chips-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
         }
 
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 22px;
-            width: 22px;
-            border-radius: 50%;
-            background: var(--primary);
+        .preset-chip {
+            background: rgba(51, 65, 85, 0.3);
+            border: 1px solid var(--border-glow);
+            color: var(--text-main);
+            padding: 0.5rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.82rem;
+            font-weight: 500;
             cursor: pointer;
-            margin-top: -9px;
-            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.4);
-            transition: transform 0.1s;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
-        input[type=range]::-webkit-slider-thumb:hover {
-            transform: scale(1.15);
+        .preset-chip:hover {
+            background: rgba(99, 102, 241, 0.12);
+            border-color: rgba(99, 102, 241, 0.5);
+            transform: translateY(-1px);
         }
 
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 6px;
-            cursor: pointer;
-            background: var(--border);
-            border-radius: 3px;
+        .preset-chip.chip-pos:hover {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.5);
         }
 
+        .preset-chip.chip-neu:hover {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
+        .preset-chip.chip-neg:hover {
+            background: rgba(244, 63, 94, 0.12);
+            border-color: rgba(244, 63, 94, 0.5);
+        }
+
+        /* Master CTA Button */
         .submit-btn {
+            position: relative;
             width: 100%;
-            padding: 1.2rem;
-            background: var(--primary);
+            padding: 1.1rem;
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            border-radius: var(--radius-lg);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 2.5rem;
+            transition: var(--transition-smooth);
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: 0.5s;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
         }
 
         .submit-btn:hover {
-            background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(2, 132, 199, 0.2);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
         }
 
         .submit-btn:disabled {
-            background: var(--text-muted);
+            background: rgba(51, 65, 85, 0.5);
+            color: var(--text-muted);
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
 
-        /* Results Section */
-        #results {
-            display: none;
-            margin-top: 2.5rem;
-            padding-top: 2.5rem;
-            border-top: 1px solid var(--border);
-            text-align: center;
-            animation: fadeIn 0.5s ease;
+        /* Information & Analytics Sidebar */
+        .analytics-sidebar {
+            padding: 3rem 2rem;
+            background: rgba(15, 23, 42, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 2.5rem;
+            position: relative;
         }
 
+        @media (max-width: 900px) {
+            .analytics-sidebar {
+                padding: 2rem 1.5rem;
+                justify-content: flex-start;
+                gap: 2rem;
+            }
+        }
+
+        .sidebar-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Telemetry Performance Metrics Grid */
+        .telemetry-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .telemetry-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            transition: var(--transition-smooth);
+        }
+
+        .telemetry-card:hover {
+            border-color: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .telemetry-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .telemetry-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .telemetry-value span {
+            color: var(--cyan);
+        }
+
+        /* Beautiful Dynamic Results Glass-Panel */
+        .results-panel-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .welcome-panel {
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+            padding: 2.5rem 1.5rem;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .welcome-icon {
+            font-size: 2.8rem;
+            filter: drop-shadow(0 4px 12px rgba(6, 182, 212, 0.2));
+            animation: wobble 4s infinite alternate ease-in-out;
+        }
+
+        @keyframes wobble {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-8px) rotate(5deg); }
+        }
+
+        .welcome-panel h3 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .welcome-panel p {
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        /* Active Results Box (Glowing with Theme Accents) */
+        .results-active-box {
+            display: none;
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-glow);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        /* Sentiment glowing border top */
+        .results-active-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--theme-color, var(--primary));
+            box-shadow: 0 2px 20px var(--theme-color, var(--primary));
+        }
+
+        .sentiment-glowing-emoticon {
+            font-size: 3.2rem;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+            filter: drop-shadow(0 4px 15px var(--theme-glow-color, rgba(255,255,255,0.1)));
+        }
+
+        .results-active-box h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--theme-color, var(--text-main));
+            text-transform: capitalize;
+            letter-spacing: -0.5px;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Gorgeous Custom Confidence Meter Gauge */
+        .meter-container {
+            position: relative;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .meter-label-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+        }
+
+        .meter-score {
+            font-family: 'Outfit', sans-serif;
+            color: var(--theme-color, var(--text-main));
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .meter-track {
+            height: 8px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .meter-bar-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--theme-color, var(--cyan)));
+            box-shadow: 0 0 10px var(--theme-color, var(--cyan));
+            transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .insight-description {
+            font-size: 0.88rem;
+            color: var(--text-main);
+            line-height: 1.6;
+            background: rgba(255,255,255,0.02);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* Beautiful Loading Skeleton State */
+        .skeleton-loader {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            animation: pulse 1.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .skeleton-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            margin: 0 auto;
+        }
+
+        .skeleton-line {
+            height: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .skeleton-line.sm {
+            width: 50%;
+        }
+
+        .skeleton-card {
+            height: 60px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            width: 100%;
+        }
+
+        /* Errors Panel */
+        .error-message {
+            display: none;
+            background: rgba(244, 63, 94, 0.08);
+            border: 1px solid rgba(244, 63, 94, 0.25);
+            color: #fda4af;
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            text-align: center;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Generic Animations */
         @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .badge {
-            display: inline-block;
-            padding: 1rem 2.5rem;
-            border-radius: 50px;
-            font-size: 1.3rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 2rem;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .badge.positive { background: var(--success); }
-        .badge.neutral { background: var(--warning); }
-        .badge.negative { background: var(--danger); }
-
-        .confidence-container {
-            max-width: 450px;
-            margin: 0 auto 2rem auto;
-            text-align: left;
-            background: #f8fafc;
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        .confidence-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-            color: var(--text-main);
-        }
-
-        .progress-bar {
-            height: 10px;
-            background: var(--border);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--primary);
-            width: 0%;
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .result-message {
-            font-size: 1.2rem;
-            color: var(--text-main);
-            font-weight: 500;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            display: none;
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            display: none;
-            background: #fef2f2;
-            color: var(--danger);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid #fecaca;
-            margin-top: 1.5rem;
-            font-weight: 500;
+        .brand-footer {
+            font-size: 0.7rem;
+            color: var(--text-muted);
             text-align: center;
+            opacity: 0.65;
+            line-height: 1.4;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>Airline Review Sentiment Analyzer</h1>
-        <p>AI-Powered Passenger Experience Insights</p>
-    </div>
-    
-    <div class="content">
-        <form id="analyzerForm">
-            <div class="form-group">
-                <label for="reviewText">Review Comments</label>
-                <textarea id="reviewText" placeholder="Write your airline review here..." required></textarea>
+    <!-- Outer Ambient Glow elements -->
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <div class="container">
+        <!-- Main Workspace Section -->
+        <main class="workspace">
+            <!-- Header Brand Branding -->
+            <header class="brand-header">
+                <div class="brand-logo-container">
+                    <span class="brand-logo">✈️</span>
+                </div>
+                <div class="brand-text">
+                    <h1>AeroSense AI</h1>
+                    <p>Passenger Feedback Sentiment Classifier</p>
+                </div>
+            </header>
+
+            <!-- Text area and typing stats -->
+            <form id="analyzerForm" class="form-section">
+                <div class="section-label">
+                    <span>Passenger Review Text</span>
+                    <span style="color: var(--cyan); font-size: 0.8rem;">Logistic Regression Active</span>
+                </div>
+                <div class="textarea-wrapper">
+                    <textarea id="reviewText" placeholder="Start typing the passenger review details here..." required></textarea>
+                    
+                    <div class="typing-stats">
+                        <div class="stat-item"><span id="charCount">0</span> chars</div>
+                        <div class="stat-item"><span id="wordCount">0</span> words</div>
+                        <div class="stat-item"><span id="readTime">0</span> sec read</div>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="submit-btn">
+                    <span id="btnText">Analyze Sentiment ✈️</span>
+                </button>
+            </form>
+
+            <div id="errorMessage" class="error-message"></div>
+
+            <!-- Preset Samples Section -->
+            <section class="chips-container">
+                <span class="chips-title">Quick Test Templates</span>
+                <div class="chips-list">
+                    <button class="preset-chip chip-pos" onclick="fillExample('positive')">
+                        🟢 Happy Passenger
+                    </button>
+                    <button class="preset-chip chip-neu" onclick="fillExample('neutral')">
+                        🟡 Neutral Journey
+                    </button>
+                    <button class="preset-chip chip-neg" onclick="fillExample('negative')">
+                        🔴 Frustrated Passenger
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Information / Results Sidebar Section -->
+        <aside class="analytics-sidebar">
+            <div class="results-panel-container">
+                <!-- Welcome/Empty State Panel -->
+                <div id="welcomePanel" class="welcome-panel">
+                    <div class="welcome-icon">⚡</div>
+                    <h3>Engine Ready</h3>
+                    <p>Enter review remarks or click a quick template to start analyzing real-time NLP outputs.</p>
+                </div>
+
+                <!-- Skeleton Loading Panel -->
+                <div id="skeletonLoader" class="skeleton-loader">
+                    <div class="skeleton-circle"></div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line sm"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+
+                <!-- Active Inference Results Box -->
+                <div id="resultsActiveBox" class="results-active-box">
+                    <span id="sentimentEmoticon" class="sentiment-glowing-emoticon">😊</span>
+                    <h2 id="sentimentTitle">Positive</h2>
+                    
+                    <div class="meter-container">
+                        <div class="meter-label-flex">
+                            <span>Confidence Level</span>
+                            <span id="confidencePercentage" class="meter-score">0%</span>
+                        </div>
+                        <div class="meter-track">
+                            <div id="meterBarFill" class="meter-bar-fill"></div>
+                        </div>
+                    </div>
+                    
+                    <p id="insightDescription" class="insight-description">The feedback reflects strong satisfaction in service and quality.</p>
+                </div>
             </div>
 
-
-
-            <button type="submit" id="submitBtn" class="submit-btn">
-                <span id="btnText">Analyze Sentiment ✈️</span>
-                <div id="spinner" class="spinner"></div>
-            </button>
-        </form>
-
-        <div id="errorMessage" class="error-message"></div>
-
-        <div id="results">
-            <div id="sentimentBadge" class="badge"></div>
-            
-            <div class="confidence-container">
-                <div class="confidence-label">
-                    <span>Confidence Score</span>
-                    <span id="confidenceValue">0%</span>
-                </div>
-                <div class="progress-bar">
-                    <div id="confidenceFill" class="progress-fill"></div>
+            <!-- Technical Telemetry Stats Dashboard -->
+            <div class="telemetry-section">
+                <span class="sidebar-section-title">Model Telemetry</span>
+                <div class="telemetry-grid">
+                    <div class="telemetry-card">
+                        <span class="telemetry-label">Classifier</span>
+                        <span class="telemetry-value">LogReg ⭐</span>
+                    </div>
+                    <div class="telemetry-card">
+                        <span class="telemetry-label">Accuracy</span>
+                        <span class="telemetry-value">75.3%</span>
+                    </div>
+                    <div class="telemetry-card">
+                        <span class="telemetry-label">Vocab size</span>
+                        <span class="telemetry-value">1,000 <span>w</span></span>
+                    </div>
+                    <div class="telemetry-card">
+                        <span class="telemetry-label">Latency</span>
+                        <span class="telemetry-value">&lt; 15<span>ms</span></span>
+                    </div>
                 </div>
             </div>
-            
-            <p id="resultMessage" class="result-message"></p>
-        </div>
+
+            <!-- Footer Branding Credit -->
+            <footer class="brand-footer">
+                MIU CS Faculty · Team 01 © 2026<br>
+                Classifying Airline Sentiment at Scale
+            </footer>
+        </aside>
     </div>
-</div>
 
-<script>
-
-
-    document.getElementById('analyzerForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const spinner = document.getElementById('spinner');
-        const resultsDiv = document.getElementById('results');
-        const errorDiv = document.getElementById('errorMessage');
-        const confidenceFill = document.getElementById('confidenceFill');
-        
-        errorDiv.style.display = 'none';
-        resultsDiv.style.display = 'none';
-        confidenceFill.style.width = '0%';
-        submitBtn.disabled = true;
-        btnText.style.display = 'none';
-        spinner.style.display = 'block';
-
-        const payload = {
-            review: document.getElementById('reviewText').value
+    <script>
+        // Preset examples array corresponding to expectations
+        const examples = {
+            positive: "The cabin crew was incredibly sweet and helpful! The seats were extremely comfortable, with ample legroom. We arrived early and food service was excellent.",
+            neutral: "An average flight experience. The staff was polite, but the food selection was quite limited and seats felt a bit cramped for a long haul.",
+            negative: "Terrible flight! Our luggage was delayed, the cabin crew ignored passenger calls, and the seat recline was completely broken. Never flying with them again."
         };
 
-        try {
-            const response = await fetch('/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
+        const textarea = document.getElementById('reviewText');
+        const charCount = document.getElementById('charCount');
+        const wordCount = document.getElementById('wordCount');
+        const readTime = document.getElementById('readTime');
 
-            const data = await response.json();
+        // Dynamic typing stats calculation
+        textarea.addEventListener('input', updateStats);
 
-            if (!response.ok) {
-                throw new Error(data.error || 'Server error occurred');
+        function updateStats() {
+            const text = textarea.value;
+            charCount.textContent = text.length;
+            
+            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            wordCount.textContent = words;
+            
+            // Reading speed average: 200 WPM
+            const readSeconds = Math.ceil((words / 200) * 60);
+            readTime.textContent = words === 0 ? 0 : readSeconds;
+        }
+
+        // Auto fills a template review and submits
+        function fillExample(sentiment) {
+            textarea.value = examples[sentiment];
+            updateStats();
+            document.getElementById('analyzerForm').dispatchEvent(new Event('submit'));
+        }
+
+        // Form submit handler
+        document.getElementById('analyzerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            // Panels
+            const welcomePanel = document.getElementById('welcomePanel');
+            const skeletonLoader = document.getElementById('skeletonLoader');
+            const resultsActiveBox = document.getElementById('resultsActiveBox');
+            const meterBarFill = document.getElementById('meterBarFill');
+            
+            // Setup loading state
+            errorDiv.style.display = 'none';
+            welcomePanel.style.display = 'none';
+            resultsActiveBox.style.display = 'none';
+            skeletonLoader.style.display = 'flex';
+            meterBarFill.style.width = '0%';
+            
+            submitBtn.disabled = true;
+            btnText.textContent = "Analyzing Pipeline...";
+
+            const payload = {
+                review: textarea.value
+            };
+
+            // Mimic slight processing state transition delay for high premium UX feel
+            const startTime = performance.now();
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Server error encountered');
+                }
+
+                // Add standard artificial minimum latency if network is too fast
+                const elapsedTime = performance.now() - startTime;
+                const minWait = 450; 
+                if (elapsedTime < minWait) {
+                    await new Promise(resolve => setTimeout(resolve, minWait - elapsedTime));
+                }
+
+                showResults(data.sentiment, data.confidence);
+
+            } catch (error) {
+                skeletonLoader.style.display = 'none';
+                welcomePanel.style.display = 'flex';
+                errorDiv.textContent = `Deployment Error: ${error.message}`;
+                errorDiv.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = "Analyze Sentiment ✈️";
+            }
+        });
+
+        // Displays elite outcomes
+        function showResults(sentiment, confidence) {
+            const skeletonLoader = document.getElementById('skeletonLoader');
+            const resultsActiveBox = document.getElementById('resultsActiveBox');
+            
+            const icon = document.getElementById('sentimentEmoticon');
+            const title = document.getElementById('sentimentTitle');
+            const pct = document.getElementById('confidencePercentage');
+            const barFill = document.getElementById('meterBarFill');
+            const desc = document.getElementById('insightDescription');
+
+            skeletonLoader.style.display = 'none';
+            resultsActiveBox.style.display = 'block';
+
+            const sentimentStr = String(sentiment).toLowerCase();
+            const percentage = Math.round(confidence * 100);
+
+            // Establish color theme tags & insights dynamically
+            if (sentimentStr === 'positive' || sentimentStr === '2') {
+                resultsActiveBox.style.setProperty('--theme-color', 'var(--color-positive)');
+                resultsActiveBox.style.setProperty('--theme-glow-color', 'var(--color-positive-glow)');
+                icon.textContent = '😊';
+                title.textContent = 'Positive';
+                desc.textContent = 'Excellent feedback! The passenger highly appreciates the cabin service, seating comfort, or journey values.';
+            } else if (sentimentStr === 'neutral' || sentimentStr === '1') {
+                resultsActiveBox.style.setProperty('--theme-color', 'var(--color-neutral)');
+                resultsActiveBox.style.setProperty('--theme-glow-color', 'var(--color-neutral-glow)');
+                icon.textContent = '🤔';
+                title.textContent = 'Neutral';
+                desc.textContent = 'Moderated experience. Includes mixed ratings or standard remarks without strong emotional swings.';
+            } else if (sentimentStr === 'negative' || sentimentStr === '0') {
+                resultsActiveBox.style.setProperty('--theme-color', 'var(--color-negative)');
+                resultsActiveBox.style.setProperty('--theme-glow-color', 'var(--color-negative-glow)');
+                icon.textContent = '😞';
+                title.textContent = 'Negative';
+                desc.textContent = 'Frustrated passenger remarks. Common alerts include delays, cabin crew issues, or lack of flight amenities.';
+            } else {
+                resultsActiveBox.style.setProperty('--theme-color', 'var(--primary)');
+                resultsActiveBox.style.setProperty('--theme-glow-color', 'var(--primary-glow)');
+                icon.textContent = '✈️';
+                title.textContent = sentiment;
+                desc.textContent = 'Review successfully classified by the optimized ML linear pipeline.';
             }
 
-            showResults(data.sentiment, data.confidence);
-
-        } catch (error) {
-            errorDiv.textContent = `Error: ${error.message}`;
-            errorDiv.style.display = 'block';
-        } finally {
-            submitBtn.disabled = false;
-            btnText.style.display = 'block';
-            spinner.style.display = 'none';
+            pct.textContent = `${percentage}%`;
+            
+            // Trigger animation frame for bar fill
+            setTimeout(() => {
+                barFill.style.width = `${percentage}%`;
+            }, 50);
         }
-    });
-
-    function showResults(sentiment, confidence) {
-        const resultsDiv = document.getElementById('results');
-        const badge = document.getElementById('sentimentBadge');
-        const confidenceFill = document.getElementById('confidenceFill');
-        const confidenceValue = document.getElementById('confidenceValue');
-        const resultMessage = document.getElementById('resultMessage');
-
-        badge.className = 'badge';
-        
-        const sentimentStr = String(sentiment).toLowerCase();
-        let percentage = Math.round(confidence * 100);
-
-        if (sentimentStr === 'positive' || sentimentStr === '2') {
-            badge.classList.add('positive');
-            badge.textContent = 'Positive';
-            resultMessage.textContent = 'Great experience! This passenger loved their flight ✈️';
-        } else if (sentimentStr === 'neutral' || sentimentStr === '1') {
-            badge.classList.add('neutral');
-            badge.textContent = 'Neutral';
-            resultMessage.textContent = 'Mixed experience. Room for improvement 🤔';
-        } else if (sentimentStr === 'negative' || sentimentStr === '0') {
-            badge.classList.add('negative');
-            badge.textContent = 'Negative';
-            resultMessage.textContent = 'Poor experience. Passenger was unsatisfied 😞';
-        } else {
-            badge.classList.add('neutral');
-            badge.textContent = sentiment;
-            resultMessage.textContent = 'Analysis complete.';
-        }
-
-        resultsDiv.style.display = 'block';
-        confidenceValue.textContent = `${percentage}%`;
-        
-        setTimeout(() => {
-            confidenceFill.style.width = `${percentage}%`;
-        }, 50);
-    }
-</script>
+    </script>
 
 </body>
 </html>
