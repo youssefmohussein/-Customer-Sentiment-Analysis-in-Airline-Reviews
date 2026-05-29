@@ -13,6 +13,8 @@ This project builds an end-to-end **sentiment classification pipeline** for airl
 
 The paper was written and typeset in **Overleaf (LaTeX)**, experiments were run in **Google Colab**, and results are hosted on a **project website** showcasing the best-performing model.
 
+🌐 **Live Demo:** [https://customer-sentiment-analysis-in-airline.onrender.com](https://customer-sentiment-analysis-in-airline.onrender.com)
+
 ---
 
 
@@ -183,19 +185,23 @@ print(predict_sentiment("Flight delayed by 3 hours. Staff were rude and unhelpfu
 
 The project website provides an interactive demo of the **Logistic Regression** model. Users can paste any airline review and receive an instant sentiment prediction.
 
+🔗 **Live at:** [https://customer-sentiment-analysis-in-airline.onrender.com](https://customer-sentiment-analysis-in-airline.onrender.com)
+
 To run locally:
 
 ```bash
-cd website
-# No build step needed — open index.html directly in your browser
-open index.html
+# No build step needed — the Flask backend serves the frontend automatically
+pip install -r requirements.txt
+python app.py
+# Then open http://localhost:5000 in your browser
 ```
 
 The website includes:
 - **Live sentiment prediction** (calls the deployed model API)
-- **Results dashboard** with all model comparison charts
-- **Dataset explorer** with word clouds and bigram visualizations
-- **About the team** section
+- **Confidence meter** showing model certainty
+- **Quick-test templates** for Positive, Neutral, and Negative reviews
+- **Real-time typing stats** (character count, word count, reading time)
+- **Model telemetry** dashboard (classifier type, accuracy, vocab size, latency)
 
 ---
 
