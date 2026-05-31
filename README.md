@@ -256,9 +256,8 @@ Citation (BibTeX):
 | Youssef Ahmed | 23077362 | youssef23077362@miuegypt.edu.eg |
 | Abdelrahman Montaser | 23049973 | abdelrhman23049973@miuegypt.edu.eg |
 | Mariam Tamer | 23012524 | mariam23012524@miuegypt.edu.eg |
-| Jana Mohamed | 23080055 | jana23080055@miuegypt.edu.eg |
+| Jana Mohamed | 23080055 | jana2308005@miuegypt.edu.eg |
 
-**Supervisor:** Dr. Diaa Andelmoneim
 
 ---
 
